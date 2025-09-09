@@ -56,6 +56,8 @@ class VfsTerminal(Gtk.ApplicationWindow):
 		vfs_input.set_position(7)
 		#print(command_line) #для отладки
 		self.vfs_history_input(command_line)
+		
+		self.vfs_terminal(command_line)
 
 	def vfs_history_input(self, text, text_source = "", prev_char = "\n", next_char = ""):
 
@@ -80,7 +82,30 @@ class VfsTerminal(Gtk.ApplicationWindow):
 		return False
 
 	def vfs_terminal(self, command_line):
-		pass
+
+		command_words = command_line.split()
+
+		#print(command_words)
+
+		if (len(command_words) < 2 or (( command_words[0] + " " + command_words[1] + " " ) != self.USER)):
+			self.vfs_history_input("Неккоректный источник", self.SYSTEM)
+			return
+		
+		sourse = command_words[:2]
+		command_words.pop(0)
+		command_words.pop(0)
+		
+		if len(command_words) == 0: return
+
+		command_lenght = len(command_words)
+
+		if command_words[0] == "exit":
+			if command_lenght == 1:
+				self.get_application().quit()
+			else:
+				self.vfs_history_input("Неождианные аргументы у команды exit: " + " ".join(command_words[1:]), self.SYSTEM)
+		else:
+				self.vfs_history_input("Неизвестная команда: " + command_words[0], self.SYSTEM)
 
 
 def on_activate(app):
