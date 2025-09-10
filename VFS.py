@@ -100,13 +100,101 @@ class VfsTerminal(Gtk.ApplicationWindow):
 		command_lenght = len(command_words)
 
 		if command_words[0] == "exit":
-			if command_lenght == 1:
-				self.get_application().quit()
-			else:
-				self.vfs_history_input("Неождианные аргументы у команды exit: " + " ".join(command_words[1:]), self.SYSTEM)
+			self.c_exit(command_words, command_lenght)
+		elif command_words[0] == "ls":
+			self.c_ls(command_words, command_lenght)
+		elif command_words[0] == "cd":
+			self.c_cd(command_words, command_lenght)
 		else:
 				self.vfs_history_input("Неизвестная команда: " + command_words[0], self.SYSTEM)
 
+	def c_exit(self, command_list, command_lenght):
+		
+			if command_lenght == 1:
+				self.get_application().quit()
+			else:
+				self.vfs_history_input("Неожиданные аргументы у команды exit: " + " ".join(command_list[1:]), self.SYSTEM)
+
+	def c_ls(self, command_list, command_lenght):
+
+		args = ["-l", "-t", "-a"]		
+
+		if command_lenght == 1:
+			self.vfs_history_input("ls", self.SYSTEM)
+		else:	
+			result_line = "ls "
+			error_line = "Неверные аргументы у команды ls:"
+			error_check = False
+			for i in command_list[1:]:
+				if i in args:
+					result_line += " " + i
+				else:
+					error_check = True
+					error_line += " | " + i
+			if error_check:
+				self.vfs_history_input(error_line + " |", self.SYSTEM)
+			else:
+				self.vfs_history_input(result_line, self.SYSTEM)
+
+	def c_cd(self, command_list, command_lenght):
+
+		args = ["-P", "-L", "-e"]		
+
+		if command_lenght == 1:
+			self.vfs_history_input("cd", self.SYSTEM)
+		else:	
+			result_line = ""
+			file_line = ""
+			args_line = "cd "
+			error_line = "Неверные аргументы у команды cd:"
+			error_check = False
+			for i in command_list[1:]:
+				if i [0] == "-":
+					if i in args:
+						args_line += " " + i
+					else:
+						error_check = True
+						error_line += " | " + i
+				elif file_line != "":
+					error_line = "| Слишком много аргументов"
+					error_check = True
+					break
+				else:
+					file_line = self.arg_parser(i)
+					if file_line == '"error"':
+						error_line = "| Фокусы с кавычками запрещены"
+						error_check = True
+						break
+					else:
+						file_line = " ---open--> " + file_line
+			if error_check:
+				self.vfs_history_input(error_line + " |", self.SYSTEM)
+			else:
+				result_line = args_line + file_line
+				self.vfs_history_input(result_line, self.SYSTEM)
+
+	def arg_parser(self, argument):
+
+		valid_list = []
+
+		if (argument.count("'") % 2) != 0:
+			return "error"
+		if (argument.count('"') % 2) != 0:
+			return "error"
+
+		for i in argument:
+			if i == "'" or i == '"':
+				if len(valid_list) == 0 or i != valid_list[len(valid_list) - 1]:
+					valid_list.append(i)
+				else:
+					valid_list.pop()
+		if len(valid_list) != 0:
+			return "error"
+		argument = argument.replace("'", "")
+		argument = argument.replace('"', '')
+		argument = argument.replace(" ", "_")
+
+		return argument
 
 def on_activate(app):
 	# создаём окно
