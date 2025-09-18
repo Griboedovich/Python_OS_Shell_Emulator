@@ -1,4 +1,7 @@
 import gi # модкль для работы с API связанных с PyGObject который содержит GTK
+import sys
+
+print(sys.argv)
 
 gi.require_version("Gtk", "4.0") # подключает пространство имён Gtk версии 4
 from gi.repository import Gtk, GLib
@@ -13,11 +16,14 @@ class VfsTerminal(Gtk.ApplicationWindow):
 
 		self.SYSTEM = "system > "
 		self.USER = "user > "
+		self.SCRYPT = "srypt > "
 
 		self.created_history()
 		self.created_input()
 
 		self.vfs_buffer.set_text(self.SYSTEM + "WELCOME TO MUSHROOM VFS")
+
+		GLib.timeout_add(20, self.terminal_configuration)
 
 	def created_history(self):
 		# создаём текстовое поле в всё окно
@@ -101,7 +107,7 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			self.vfs_history_input("Неизвестная ошибка, как вы вообще получили это сообщение?", self.SYSTEM)			
 			return
 
-		if ( sourse != self.USER):
+		if ( not sourse in (self.USER, self.SCRYPT)):
 			self.vfs_history_input("Неккоректный источник", self.SYSTEM)
 			return
 		
@@ -260,6 +266,44 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			else:
 				result_line = args_line + file_line
 				self.vfs_history_input(result_line, self.SYSTEM)
+
+	def terminal_configuration(self):
+
+		parameters = sys.argv
+
+		if len(parameters) == 1:
+			return
+		elif len(parameters) > 3:
+			self.vfs_history_input("Слишком много аргументов конфигурации", self.SYSTEM)
+			return
+		elif len(parameters) < 3:
+			self.vfs_history_input("Не хватает аргументов конфигурации", self.SYSTEM)
+			return
+
+		self.vfs_history_input("MUSHROOM VFS запущен со следующими аргументами:    1 - '" + parameters[1] + "'     2 - '" + parameters[2]+ "'" , self.SYSTEM)
+
+
+		try:
+			with open(parameters[1], "r") as vfs:
+				pass
+		except:
+
+			self.vfs_history_input("Файл виртуальной файловой системы не найден", self.SYSTEM)
+			return
+
+		try:
+			with open(parameters[2], "r") as script:
+				command_line = script.readline()
+				while command_line:
+
+					command_line = command_line.rstrip()
+
+					self.vfs_history_input(command_line, self.SCRYPT)
+					self.vfs_terminal(self.SCRYPT + command_line)
+					command_line = script.readline()
+		except:
+			self.vfs_history_input("Файл стартового скрипта не найден", self.SYSTEM)
+			return
 
 def on_activate(app):
 	# создаём окно

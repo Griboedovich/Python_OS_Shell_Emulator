@@ -1,0 +1,4 @@
+cd -P -L -e 1.txt
+ls -l -t -a
+ded inside
+exit -

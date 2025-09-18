@@ -1,0 +1,10 @@
+ls
+ls -l
+ls -t
+ls -a
+ls -l -t -a
+ls -k
+ls -l k
+ls -t -a -k
+ld ded
+ls ded
