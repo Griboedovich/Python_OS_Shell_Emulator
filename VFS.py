@@ -1,8 +1,6 @@
 import gi # модкль для работы с API связанных с PyGObject который содержит GTK
 import sys
 
-print(sys.argv)
-
 gi.require_version("Gtk", "4.0") # подключает пространство имён Gtk версии 4
 from gi.repository import Gtk, GLib
 
