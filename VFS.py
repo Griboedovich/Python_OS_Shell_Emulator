@@ -1,8 +1,31 @@
 import gi # модкль для работы с API связанных с PyGObject который содержит GTK
 import sys
+import xml.etree.ElementTree as ET
+
 
 gi.require_version("Gtk", "4.0") # подключает пространство имён Gtk версии 4
 from gi.repository import Gtk, GLib
+
+class Directory():
+	def __init__(self, name, parent):
+		self.name = name
+		self.parent = parent
+		self.childs = []
+	def addChild (self,child):
+		self.child.append(child)
+	def getName(self):
+		return self.name
+	def getChilds(self):
+		return self.childs
+
+class File():
+	def __init__(self, name, f_type, data, parent):
+		self.name = name
+		self.type = f_type
+		self.data = data
+		self.parent = parent
+	def toString(self):
+		return f"{self.name}.{self.type}"
 
 class VfsTerminal(Gtk.ApplicationWindow):
 	def __init__(self, **kargs):
@@ -15,6 +38,9 @@ class VfsTerminal(Gtk.ApplicationWindow):
 		self.SYSTEM = "system > "
 		self.USER = "user > "
 		self.SCRYPT = "srypt > "
+
+		self.root_directory = None
+		self.current_directory = None
 
 		self.created_history()
 		self.created_input()
@@ -284,10 +310,23 @@ class VfsTerminal(Gtk.ApplicationWindow):
 		try:
 			with open(parameters[1], "r") as vfs:
 				pass
+
 		except:
 
 			self.vfs_history_input("Файл виртуальной файловой системы не найден", self.SYSTEM)
 			return
+
+		#=================
+		print(parameters[1][-4:])
+
+		if (parameters[1][-4:]) != ".xml":
+			self.vfs_history_input("Файл виртуальной файловой системы должен иметь расширение .xml", self.SYSTEM)
+			return
+
+		if not(self.createdVFS(parameters[1])):
+			return
+
+		#================
 
 		try:
 			with open(parameters[2], "r") as script:
@@ -302,6 +341,65 @@ class VfsTerminal(Gtk.ApplicationWindow):
 		except:
 			self.vfs_history_input("Файл стартового скрипта не найден", self.SYSTEM)
 			return
+
+	def createdVFS(self, path):
+		tree = ET.parse(path)
+		root = tree.getroot()
+
+		if (root.tag != "directory"):
+			self.vfs_history_input("Источник виртуальной файловой системы должен содержать корневую директорию", self.SYSTEM)
+			return False
+
+		root_directory = Directory(root.attrib["name"], None)
+
+		self.root_directory = root_directory
+		self.current_directory = root_directory
+
+		if not(self.parseXml(self.current_directory)):
+			self.vfs_history_input("Неверный формат данных в VFS", self.SYSTEM)
+			return False
+		return True
+
+
+	def parseXml(self, directory):
+
+		self.current_directory = directory
+
+		for child in directory.getChilds():
+
+			if (child.tag == "directory"):
+				directory = Directory(child.attrib["name"], current_directory)
+
+				self.current_directory.addChild(directory)
+
+				if not(self.parseXML(child)):
+					return False
+
+				self.current_directory = directory
+
+			elif (child.tag == "file"):
+
+				if child[0].tag != "data":
+					return False
+					print(1)
+
+				if child.attrib["type"] == "txt":
+
+					file = File(child.attrib["name"], child.attrib["type"], child[0].text, current_directory)
+
+				elif child.attrib["type"] in ("bin", "png"):
+					
+					file = File(child.attrib["name"], child.attrib["type"], child[0].text, current_directory)
+				else:
+					return False
+					print(2) 
+
+				self.current_directory.addChild(file)
+
+			else:
+				return False
+				print(3)
+		return True
 
 def on_activate(app):
 	# создаём окно
