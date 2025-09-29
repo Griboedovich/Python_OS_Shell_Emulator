@@ -1,7 +1,7 @@
 import gi # модкль для работы с API связанных с PyGObject который содержит GTK
 import sys
 import xml.etree.ElementTree as ET
-import base64
+#import base64
 
 gi.require_version("Gtk", "4.0") # подключает пространство имён Gtk версии 4
 from gi.repository import Gtk, GLib
@@ -423,8 +423,8 @@ class VfsTerminal(Gtk.ApplicationWindow):
 
 				elif child.attrib["type"] in ("bin", "png"):
 					
-					#file = File(child.attrib["name"], child.attrib["type"], child[0].text, self.current_directory)
-					file = File(child.attrib["name"], child.attrib["type"], self.bin_data_decode(child[0].text), self.current_directory)
+					file = File(child.attrib["name"], child.attrib["type"], child[0].text, self.current_directory)
+					#file = File(child.attrib["name"], child.attrib["type"], self.bin_data_decode(child[0].text), self.current_directory)
 
 				else:
 					return False
@@ -435,6 +435,7 @@ class VfsTerminal(Gtk.ApplicationWindow):
 				return False
 		return True
 
+"""
 	def bin_data_decode(self, data):
 
 		base64_bytes = data.encode('ascii') #преобразует обычную строку в байтовую
@@ -444,6 +445,7 @@ class VfsTerminal(Gtk.ApplicationWindow):
 		message = message_bytes.decode('ascii') #преобразует байтовую строку в исходную str строку
 
 		return message
+"""
 
 def on_activate(app):
 	# создаём окно
