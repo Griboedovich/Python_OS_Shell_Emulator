@@ -372,7 +372,14 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			return
 
 	def createdVFS(self, path):
-		tree = ET.parse(path)
+
+		try:
+			tree = ET.parse(path)
+		except:
+			self.vfs_history_input("Невозможная структура VFS", self.SYSTEM)
+			return False
+
+
 		root = tree.getroot()
 
 		if (root.tag != "directory"):

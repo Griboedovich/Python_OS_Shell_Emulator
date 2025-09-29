@@ -6,10 +6,10 @@
 
 	<directory name = "home">
 
-		<file name = "2" type = "bin">
+		<file name = "numbers" type = "bin">
 			<data>SGVsbG8gd29ybGQ=</data>
 		</file>
-		<file name = "2" type = "png">
+		<file name = "cat" type = "png">
 			<data>SSB3YW50IHRvIHNsZWVw</data>
 		</file>
 

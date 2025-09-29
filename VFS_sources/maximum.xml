@@ -1,0 +1,63 @@
+<directory name = "root">
+
+	<file name = "text" type = "txt">
+		<data>Hello World!</data>
+	</file>
+
+	<directory name = "direct1">
+
+		<file name = "1.1bin" type = "bin">
+			<data>SGVsbG8gd29ybGQ=</data>
+		</file>
+		<file name = "1.2bin" type = "png">
+			<data>SSB3YW50IHRvIHNsZWVw</data>
+		</file>
+
+		<directory name = "direct2">
+
+			<file name = "2.1" type = "bin">
+				<data>SGVsbG8gd29ybGQ=</data>
+			</file>
+			<file name = "2.2" type = "png">
+				<data>SSB3YW50IHRvIHNsZWVw</data>
+			</file>
+
+			<directory name = "direct3.1">
+
+				<file name = "3.1" type = "bin">
+					<data>sgvsbg8gd29ybgq=</data>
+				</file>
+				<file name = "3.2" type = "png">
+					<data>ssb3yw50ihrvihnszwvw</data>
+				</file>
+
+			</directory>
+
+			<file name = "text3" type = "txt">
+				<data>i need sleep</data>
+			</file>
+
+			<directory name = "direct3.2">
+
+				<file name = "3.3" type = "bin">
+					<data>sgvsbg8gd29ybgq=</data>
+				</file>
+				<file name = "3.4" type = "png">
+					<data>ssb3yw50ihrvihnszwvw</data>
+				</file>
+
+			</directory>
+
+		</directory>
+
+	</directory>
+
+	<directory name = "cats">
+
+		<file name = "cat" type = "png">
+			<data>sgvsbg8gd29ybgq=</data>
+		</file>
+
+	</directory>
+
+</directory>

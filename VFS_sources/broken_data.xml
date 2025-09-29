@@ -1,0 +1,18 @@
+<directory name = "root">
+
+	<file name = "text" type = "txt">
+		<data>Hello World!</data>
+	</file>
+
+	<directory name = "home">
+
+		<file name = "2" type = "bin">
+			<data>SGVsbG8gd29ybGQ=</data>
+		</file>
+		<file name = "2" type = "png">
+			<detstvo>SSB3YW50IHRvIHNsZWVw</detstvo>
+		</file>
+
+	</directory>
+
+</directory>

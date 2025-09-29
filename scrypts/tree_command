@@ -1,0 +1,9 @@
+cd -P -L -e 1.txt
+ls -l -t -a
+ded inside
+exit -
+tree 1 2 3
+
+
+
+tree

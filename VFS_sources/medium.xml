@@ -1,0 +1,49 @@
+<directory name = "root">
+
+	<file name = "text1" type = "txt">
+		<data>Hello World!</data>
+	</file>
+
+	<file name = "text2" type = "txt">
+		<data>Hello World!</data>
+	</file>
+
+	<file name = "text3" type = "txt">
+		<data>Hello World!</data>
+	</file>
+
+
+	<directory name = "home">
+
+		<file name = "bin1" type = "bin">
+			<data>SGVsbG8gd29ybGQ=</data>
+		</file>
+
+		<file name = "png1" type = "png">
+			<data>SSB3YW50IHRvIHNsZWVw</data>
+		</file>
+
+		<file name = "bin2" type = "bin">
+			<data>Hello World!</data>
+		</file>
+
+		<file name = "png2" type = "png">
+			<data>Hello World!</data>
+		</file>
+
+	</directory>
+
+	<file name = "1" type = "txt">
+		<data>Hello World!</data>
+	</file>
+
+	<file name = "2" type = "txt">
+		<data>Hello World!</data>
+	</file>
+
+	<file name = "3" type = "txt">
+		<data>Hello World!</data>
+	</file>
+
+
+</directory>
