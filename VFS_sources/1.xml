@@ -4,13 +4,13 @@
 		<data>Hello World!</data>
 	</file>
 
-	<directory>
+	<directory name = "home">
 
 		<file name = "2" type = "bin">
 			<data>SGVsbG8gd29ybGQ=</data>
 		</file>
 		<file name = "2" type = "png">
-			<data>/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExc...</data>
+			<data>SSB3YW50IHRvIHNsZWVw</data>
 		</file>
 
 	</directory>

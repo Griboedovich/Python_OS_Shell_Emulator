@@ -1,7 +1,7 @@
 import gi # модкль для работы с API связанных с PyGObject который содержит GTK
 import sys
 import xml.etree.ElementTree as ET
-
+import base64
 
 gi.require_version("Gtk", "4.0") # подключает пространство имён Gtk версии 4
 from gi.repository import Gtk, GLib
@@ -12,7 +12,7 @@ class Directory():
 		self.parent = parent
 		self.childs = []
 	def addChild (self,child):
-		self.child.append(child)
+		self.childs.append(child)
 	def getName(self):
 		return self.name
 	def getChilds(self):
@@ -144,6 +144,8 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			self.c_ls(command, args_list)
 		elif command == "cd":
 			self.c_cd(command, args_list)
+		elif command == "tree":
+			self.c_tree(command, args_list)
 		else:
 				self.vfs_history_input("Неизвестная команда: " + command, self.SYSTEM)
 
@@ -291,6 +293,35 @@ class VfsTerminal(Gtk.ApplicationWindow):
 				result_line = args_line + file_line
 				self.vfs_history_input(result_line, self.SYSTEM)
 
+	def c_tree(self, command, args_list):
+	
+		if len(args_list) == 0:
+			if self.current_directory == None:
+				self.vfs_history_input("Виртуальная файловая система не подключена", self.SYSTEM)
+			else:
+				
+				self.vfs_history_input("\n" + self.c_tree_logic("-"), self.SYSTEM)
+		else:
+			self.vfs_history_input("Неожиданные аргументы у команды tree: " + " ".join(args_list[0:]), self.SYSTEM)
+
+	def c_tree_logic(self, indent):
+		text = indent
+		directory = self.current_directory
+		text += directory.getName()
+
+		indent += "-" * 4
+
+		for child in directory.getChilds():
+			text += '\n'
+
+			if type(child) == Directory:
+				self.current_directory = child
+				text += self.c_tree_logic(indent)
+				self.current_directory = directory
+			else:
+				text += indent + child.toString()
+		return text
+
 	def terminal_configuration(self):
 
 		parameters = sys.argv
@@ -317,8 +348,6 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			return
 
 		#=================
-		print(parameters[1][-4:])
-
 		if (parameters[1][-4:]) != ".xml":
 			self.vfs_history_input("Файл виртуальной файловой системы должен иметь расширение .xml", self.SYSTEM)
 			return
@@ -355,51 +384,66 @@ class VfsTerminal(Gtk.ApplicationWindow):
 		self.root_directory = root_directory
 		self.current_directory = root_directory
 
-		if not(self.parseXml(self.current_directory)):
-			self.vfs_history_input("Неверный формат данных в VFS", self.SYSTEM)
+		if not(self.parseXml(root)):
+			self.vfs_history_input("Неверная структура или формат данных в VFS-источнике", self.SYSTEM)
+
+			self.root_directory = None
+			self.current_directory = None
+	
 			return False
 		return True
 
 
 	def parseXml(self, directory):
 
-		self.current_directory = directory
+		current_directory = self.current_directory
 
-		for child in directory.getChilds():
+		for child in directory:
 
 			if (child.tag == "directory"):
-				directory = Directory(child.attrib["name"], current_directory)
+				directory = Directory(child.attrib['name'], current_directory)				
 
 				self.current_directory.addChild(directory)
 
-				if not(self.parseXML(child)):
+				self.current_directory = directory
+
+				if not(self.parseXml(child)):
 					return False
 
-				self.current_directory = directory
+				self.current_directory = current_directory
 
 			elif (child.tag == "file"):
 
 				if child[0].tag != "data":
 					return False
-					print(1)
 
 				if child.attrib["type"] == "txt":
 
-					file = File(child.attrib["name"], child.attrib["type"], child[0].text, current_directory)
+					file = File(child.attrib["name"], child.attrib["type"], child[0].text, self.current_directory)
 
 				elif child.attrib["type"] in ("bin", "png"):
 					
-					file = File(child.attrib["name"], child.attrib["type"], child[0].text, current_directory)
+					#file = File(child.attrib["name"], child.attrib["type"], child[0].text, self.current_directory)
+					file = File(child.attrib["name"], child.attrib["type"], self.bin_data_decode(child[0].text), self.current_directory)
+
 				else:
 					return False
-					print(2) 
 
-				self.current_directory.addChild(file)
+				current_directory.addChild(file)
 
 			else:
 				return False
-				print(3)
 		return True
+
+	def bin_data_decode(self, data):
+
+		base64_bytes = data.encode('ascii') #преобразует обычную строку в байтовую
+
+		message_bytes = base64.b64decode(base64_bytes) #декодирует бинраную строку из формата base64в исходную байтовую строку
+
+		message = message_bytes.decode('ascii') #преобразует байтовую строку в исходную str строку
+
+		return message
 
 def on_activate(app):
 	# создаём окно
