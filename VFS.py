@@ -243,24 +243,21 @@ class VfsTerminal(Gtk.ApplicationWindow):
 
 	def c_ls(self, command, args_list):
 
-		args = ["-l", "-t", "-a"]		
+		#args = ["-l", "-t", "-a"]	
+	
+		if self.current_directory is None:
+			self.vfs_history_input("Невозможно применить команду ls: отсутсвует VFS", self.SYSTEM)
+			return
 
 		if len(args_list) == 0:
-			self.vfs_history_input("ls", self.SYSTEM)
-		else:	
-			result_line = "ls "
-			error_line = "Неверные аргументы у команды ls:"
-			error_check = False
-			for i in args_list:
-				if i in args:
-					result_line += " " + i
-				else:
-					error_check = True
-					error_line += " | " + i
-			if error_check:
-				self.vfs_history_input(error_line + " |", self.SYSTEM)
-			else:
-				self.vfs_history_input(result_line, self.SYSTEM)
+
+			message = ""
+
+			for child in self.current_directory.getChilds():
+				message += "\n-" + child.name
+			self.vfs_history_input(message, self.SYSTEM)
+		else:
+			self.vfs_history_input("Неожиданные аргументы у команды ls: " + " ".join(args_list[0:]), self.SYSTEM)
 
 	def c_cd(self, command, args_list):
 
