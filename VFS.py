@@ -41,6 +41,7 @@ class VfsTerminal(Gtk.ApplicationWindow):
 
 		self.root_directory = None
 		self.current_directory = None
+		self.history_storage = []
 
 		self.created_history()
 		self.created_input()
@@ -117,7 +118,12 @@ class VfsTerminal(Gtk.ApplicationWindow):
 	def vfs_terminal(self, command_line):
 
 		sourse, command, args_list, error_check = self.vfs_parser(command_line)
-	
+		
+		#================== for history command ============
+		if command != "":
+			self.history_storage.append(command_line.replace(sourse, ""))
+		#===================================================
+
 		if error_check == "пусто":
 			self.vfs_history_input("Введена пустая строка", self.SYSTEM)			
 			return
@@ -146,6 +152,8 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			self.c_cd(command, args_list)
 		elif command == "tree":
 			self.c_tree(command, args_list)
+		elif command == "history":
+			self.c_history(command,args_list)
 		else:
 				self.vfs_history_input("Неизвестная команда: " + command, self.SYSTEM)
 
@@ -318,6 +326,22 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			else:
 				text += indent + child.toString()
 		return text
+
+	def c_history(self, command, args_list):
+		if len(self.history_storage) == 0:
+			self.vfs_history_input("История комманд пуста", self.SYSTEM)
+			return
+
+		if len(args_list) == 0:
+
+			message = ""
+
+			for i in range(len(self.history_storage)):
+				message += f"\n{str(i+1)}:    {self.history_storage[i]}"
+			self.vfs_history_input(message, self.SYSTEM)
+		else:
+			self.vfs_history_input("Неожиданные аргументы у команды history: " + " ".join(args_list[0:]), self.SYSTEM)
+
 
 	def terminal_configuration(self):
 
