@@ -1,0 +1,20 @@
+tree
+cd cats/cat
+cd cats
+ls
+cd ..
+ls
+cd direct1/direct2/direct3.2
+ls
+cd 3.3.bin
+cd
+ls
+cd -
+ls
+cd ../../../cats
+ls
+cd -
+tree
+cd
+tree
+history

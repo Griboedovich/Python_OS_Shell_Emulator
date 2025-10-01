@@ -31,7 +31,7 @@ class File():
 	def getParent(self):
 		return self.parent
 	def getName(self):
-		return self.name
+		return self.toString()
 
 class VfsTerminal(Gtk.ApplicationWindow):
 	def __init__(self, **kargs):
@@ -269,7 +269,7 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			message = ""
 
 			for child in self.current_directory.getChilds():
-				message += "\n-" + child.name
+				message += "\n-" + child.getName()
 			self.vfs_history_input(message, self.SYSTEM)
 		else:
 			self.vfs_history_input("Неожиданные аргументы у команды ls: " + " ".join(args_list[0:]), self.SYSTEM)
@@ -301,8 +301,6 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			intermediate_directory = self.current_directory
 
 			for path_directory in path_way:
-				
-				print(f"'{path_directory}'", path_directory == "..")
 				
 				if path_directory in [".", ""]:
 					continue
