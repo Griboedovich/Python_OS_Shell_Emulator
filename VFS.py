@@ -17,6 +17,8 @@ class Directory():
 		return self.name
 	def getChilds(self):
 		return self.childs
+	def getParent(self):
+		return self.parent
 
 class File():
 	def __init__(self, name, f_type, data, parent):
@@ -26,6 +28,10 @@ class File():
 		self.parent = parent
 	def toString(self):
 		return f"{self.name}.{self.type}"
+	def getParent(self):
+		return self.parent
+	def getName(self):
+		return self.name
 
 class VfsTerminal(Gtk.ApplicationWindow):
 	def __init__(self, **kargs):
@@ -42,6 +48,7 @@ class VfsTerminal(Gtk.ApplicationWindow):
 		self.root_directory = None
 		self.current_directory = None
 		self.history_storage = []
+		self.last_directory = None
 
 		self.created_history()
 		self.created_input()
@@ -269,34 +276,66 @@ class VfsTerminal(Gtk.ApplicationWindow):
 
 	def c_cd(self, command, args_list):
 
-		args = ["-P", "-L", "-e"]		
+		#args = ["-P", "-L", "-e"]		
 
-		if len( args_list ) == 0:
-			self.vfs_history_input("cd", self.SYSTEM)
-		else:	
-			result_line = ""
-			file_line = ""
-			args_line = "cd "
-			error_line = "Неверные аргументы у команды cd:"
-			error_check = False
-			for i in args_list:
-				if i [0] == "-":
-					if i in args:
-						args_line += " " + i
-					else:
-						error_check = True
-						error_line += " | " + i
-				elif file_line != "":
-					error_line = "| Слишком много аргументов"
-					error_check = True
-					break
+		if self.current_directory is None:
+			self.vfs_history_input("Невозможно применить команду cd: отсутсвует VFS", self.SYSTEM)
+			return
+
+		if len(args_list) == 0:
+
+			self.last_directory = self.current_directory
+			self.current_directory = self.root_directory
+
+			# текущая папка - root
+			
+		elif len(args_list) == 1:
+			# проверка на cd -
+
+			if args_list[0] == "-":
+				self.current_directory, self.last_directory = self.last_directory, self.current_directory
+				return
+
+			path_way = args_list[0].split("/")
+			
+			intermediate_directory = self.current_directory
+
+			for path_directory in path_way:
+				
+				print(f"'{path_directory}'", path_directory == "..")
+				
+				if path_directory in [".", ""]:
+					continue
+
+				if  path_directory == "..":
+					if not (intermediate_directory.getParent() is None):
+						intermediate_directory = intermediate_directory.getParent()
+					continue
+
+				directory = self.c_cd_search_for_name(path_directory, intermediate_directory.getChilds())
+
+				if directory is None:
+					self.vfs_history_input(f"Нет такого каталога: {path_directory}", self.SYSTEM)
+					return
+				elif not (isinstance(directory, Directory)):
+					self.vfs_history_input(f"Это не каталог: {path_directory}", self.SYSTEM)
+					return
 				else:
-					file_line = " ---open--> " + i
-			if error_check:
-				self.vfs_history_input(error_line + " |", self.SYSTEM)
-			else:
-				result_line = args_line + file_line
-				self.vfs_history_input(result_line, self.SYSTEM)
+					
+					intermediate_directory = directory
+
+			self.last_directory = self.current_directory
+			self.current_directory = intermediate_directory
+
+		else:
+			self.vfs_history_input("Слишком много аргументов", self.SYSTEM)
+
+	def c_cd_search_for_name(self, name, objects):
+	
+		for element in objects:
+			if (element.getName() == name):
+				return element
+		return None
 
 	def c_tree(self, command, args_list):
 	
