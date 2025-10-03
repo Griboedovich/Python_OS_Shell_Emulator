@@ -19,6 +19,8 @@ class Directory():
 		return self.childs
 	def getParent(self):
 		return self.parent
+	def killChild(self, child):
+		self.childs.remove(child)
 
 class File():
 	def __init__(self, name, f_type, data, parent):
@@ -55,7 +57,7 @@ class VfsTerminal(Gtk.ApplicationWindow):
 
 		self.vfs_buffer.set_text(self.SYSTEM + "WELCOME TO MUSHROOM VFS")
 
-		GLib.timeout_add(20, self.terminal_configuration)
+		GLib.timeout_add(30, self.terminal_configuration)
 
 	def created_history(self):
 		# создаём текстовое поле в всё окно
@@ -161,6 +163,8 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			self.c_tree(command, args_list)
 		elif command == "history":
 			self.c_history(command,args_list)
+		elif command == "rmdir":
+			self.c_rmdir(command, args_list)
 		else:
 				self.vfs_history_input("Неизвестная команда: " + command, self.SYSTEM)
 
@@ -378,6 +382,79 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			self.vfs_history_input(message, self.SYSTEM)
 		else:
 			self.vfs_history_input("Неожиданные аргументы у команды history: " + " ".join(args_list[0:]), self.SYSTEM)
+
+	def c_rmdir(self,command, args_list):
+		
+		#если не получилось удалить папку то выводится ошибка и след итерация
+
+		if self.current_directory is None:
+			self.vfs_history_input("Невозможно применить команду rmdir: отсутсвует VFS", self.SYSTEM)
+			return
+
+		if len(args_list) == 0:
+			self.vfs_history_input("rmdir: отсутсвуют обязательные аргументы", self.SYSTEM)
+			return
+		
+		for i in args_list:
+
+			is_path_correct, error_message, parent_directory, target = self.c_logic_path_search(i)
+
+			if (not is_path_correct):
+				self.vfs_history_input(f"rmdir: не удалось удалить каталог {target}. Ошибка пути: " + error_message, self.SYSTEM)
+				continue
+
+			target_object = self.c_cd_search_for_name(target, parent_directory.getChilds())
+
+			if target_object is None:
+				self.vfs_history_input(f"rmdir: не удалось удалить каталог {target}: Нет такого каталога" + error_message, self.SYSTEM)
+				continue
+			elif not (isinstance(target_object, Directory)):
+				self.vfs_history_input(f"rmdir: не удалось удалить каталог {target}: Это не каталог" + error_message, self.SYSTEM)
+				continue
+			elif len(target_object.getChilds()) != 0:
+				self.vfs_history_input(f"rmdir: не удалось удалить каталог {target}: Каталог не пуст" + error_message, self.SYSTEM)
+				continue
+			
+			parent_directory.killChild(target_object)
+
+	def c_logic_path_search(self, path):
+		path_way = path.split("/")
+		
+		error_message = ""		
+
+		i = 0
+
+		while i < len(path_way):
+			if path_way[i] in [".", ""]:
+				path_way.pop(i)
+			else:
+				i += 1
+			
+		target = path_way[-1]
+		path_way = path_way[ : -1]
+
+		intermediate_directory = self.current_directory
+
+		for path_directory in path_way:
+			
+			if  path_directory == "..":
+				if not (intermediate_directory.getParent() is None):
+					intermediate_directory = intermediate_directory.getParent()
+				continue
+
+			directory = self.c_cd_search_for_name(path_directory, intermediate_directory.getChilds())
+
+			if directory is None:
+				error_message = f"нет такого каталога: {path_directory}"
+				return (False, error_message,  None, None)
+			elif not (isinstance(directory, Directory)):
+				error_message = f"это не каталог: {path_directory}"
+				return (False, error_message,  None, None)
+			else:
+					
+				intermediate_directory = directory
+
+		return (True, error_message, intermediate_directory, target)
 
 
 	def terminal_configuration(self):

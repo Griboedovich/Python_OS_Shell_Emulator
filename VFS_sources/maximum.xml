@@ -22,6 +22,11 @@
 				<data>SSB3YW50IHRvIHNsZWVw</data>
 			</file>
 
+			<directory name = "empty2">
+
+			</directory>
+
+
 			<directory name = "direct3.1">
 
 				<file name = "3.1" type = "bin">
@@ -46,6 +51,11 @@
 					<data>ssb3yw50ihrvihnszwvw</data>
 				</file>
 
+				<directory name = "empty3">
+
+				</directory>
+
+
 			</directory>
 
 		</directory>
@@ -57,6 +67,10 @@
 		<file name = "cat" type = "png">
 			<data>sgvsbg8gd29ybgq=</data>
 		</file>
+
+	</directory>
+
+	<directory name = "empty1">
 
 	</directory>
 
