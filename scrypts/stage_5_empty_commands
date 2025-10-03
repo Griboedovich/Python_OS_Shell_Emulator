@@ -1,0 +1,7 @@
+rmdir test
+touch test
+cd test
+tree
+ls test
+abbrk
+history

@@ -1,0 +1,22 @@
+rmdir
+tree
+rmdir direct1
+ls
+rmdir empty1
+ls
+tree
+rmdir empty1 cats/cat.png direct1 direct1/direct2/empty2 direct1/direct2/direct3.2/empty3 direct2/touch cats/cat.png/emptyCat
+tree
+
+
+
+
+touch
+tree
+touch OBJECT1.py
+ls
+touch mem1 mem2 mem3
+ls
+tree
+touch new0 cats/new.cat direct1/new1 direct1/direct2/new2 direct1/direct2/direct3.2/new3 direct2/new5 cats/cat.png/new6
+tree

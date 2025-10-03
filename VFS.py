@@ -165,6 +165,8 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			self.c_history(command,args_list)
 		elif command == "rmdir":
 			self.c_rmdir(command, args_list)
+		elif command == "touch":
+			self.c_touch(command, args_list)
 		else:
 				self.vfs_history_input("Неизвестная команда: " + command, self.SYSTEM)
 
@@ -417,6 +419,43 @@ class VfsTerminal(Gtk.ApplicationWindow):
 			
 			parent_directory.killChild(target_object)
 
+	def c_touch(self,command, args_list):
+		
+		#если не получилось удалить папку то выводится ошибка и след итерация
+
+		if self.current_directory is None:
+			self.vfs_history_input("Невозможно применить команду touch: отсутсвует VFS", self.SYSTEM)
+			return
+
+		if len(args_list) == 0:
+			self.vfs_history_input("touch: нечего трогать", self.SYSTEM)
+			return
+		
+		for i in args_list:
+
+			is_path_correct, error_message, parent_directory, target = self.c_logic_path_search(i)
+
+			if (not is_path_correct):
+				self.vfs_history_input(f"touch: невозможно потрогать {target}. Ошибка пути: " + error_message, self.SYSTEM)
+				continue
+
+			target
+
+			point_index = target.rfind(".")
+
+			if point_index == -1:
+				file_name = target
+
+				file_type = "nontype"
+			else:
+				file_name = target[:point_index]
+
+				file_type = target[point_index + 1:]
+
+			target_object = File(file_name, file_type, "", parent_directory)			
+
+			parent_directory.addChild(target_object)
+
 	def c_logic_path_search(self, path):
 		path_way = path.split("/")
 		
@@ -446,10 +485,10 @@ class VfsTerminal(Gtk.ApplicationWindow):
 
 			if directory is None:
 				error_message = f"нет такого каталога: {path_directory}"
-				return (False, error_message,  None, None)
+				return (False, error_message,  None, target)
 			elif not (isinstance(directory, Directory)):
-				error_message = f"это не каталог: {path_directory}"
-				return (False, error_message,  None, None)
+				error_message = f"это не каталог: {path_directory}" 
+				return (False, error_message,  None, target)
 			else:
 					
 				intermediate_directory = directory
