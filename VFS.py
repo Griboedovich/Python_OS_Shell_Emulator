@@ -641,3 +641,4 @@ app.connect("activate", on_activate)
 	# запускаем приложение
 app.run(None)
 	# чтобы выйти необходимо использовать app.quit()
+
